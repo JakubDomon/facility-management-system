@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+
+{% block linki %}
+    <li class="nav-item px-3">
+        <a href="signin" class="nav-link">Zaloguj się</a>
+    </li>
+    <li class="nav-item px-3">
+        <a href="error_submit" class="nav-link">Zgłoś błąd</a>
+    </li>
+{% endblock linki %}
+
+
+{% block glownyPanel %}
+<div class="row h-100 p-3 justify-content-center">
+    <h1 class="py-2">KONTAKT</h2>
+    <div class="col w-50">
+        <h2>Dane Kontaktowe:</h2>
+        <hr class="w-75 mx-auto">
+        <div class="position-absolute align-items-start mx-4">
+            <h4 class="text-muted d-inline-block">Firma:</h4>
+            <h3 class="d-inline-block">{{nazwaFirmy}}</h3>
+            <br>
+            <h4 class="text-muted d-inline-block">Adres:</h4>
+            <h3 class="d-inline-block">{{adresFirmy}}</h3>
+            <br>
+            <h4 class="text-muted d-inline-block">NIP:</h4>
+            <h3 class="d-inline-block">{{numerNIP}}</h3>
+            <br>
+            <h4 class="text-muted d-inline-block">Telefon:</h4>
+            <h3 class="d-inline-block">{{numerTel}}</h3>
+        </div>
+    </div>
+    <div class="col w-75">
+        <div class="mb-5">
+            <h4>Zadzwoń na podany numer telefonu, lub napisz do nas:</h4>
+        </div>
+        <form method="post">
+            <!-- Email input -->
+            <div class="form-outline mb-2">
+              <input type="email" id="form6Example5" class="form-control" placeholder="Wpisz tutaj adres email" />
+              <label class="form-label" for="form6Example5"></label>
+            </div>
+          
+            <!-- Number input -->
+            <div class="form-outline mb-2">
+              <input type="tel" id="form6Example6" class="form-control" placeholder="Wpisz tutaj numer telefonu" />
+              <label class="form-label" for="form6Example6"></label>
+            </div>
+          
+            <!-- Message input -->
+            <div class="form-outline mb-2">
+              <textarea class="form-control" id="form6Example7" rows="4" placeholder="Wpisz tutaj wiadomość"></textarea>
+              <label class="form-label" for="form6Example7"></label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Wyślij wiadomość</button>
+        <form>
+
+{% endblock %}
