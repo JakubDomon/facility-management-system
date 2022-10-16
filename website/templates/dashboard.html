@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block linki %}
+{% if user.is_authenticated %}
+{% if user.role_id == 1 %}
+<li class="nav-item px-3">
+    <a href="signin" class="nav-link">Dodaj pracownika</a>
+  </li>
+{% endif %}
+<li class="nav-item px-3">
+  <a href="contact" class="nav-link">Kontakt</a>
+</li>
+<li class="nav-item px-3">
+  <a href="error_submit" class="nav-link">Zgłoś błąd</a>
+</li>
+<li class="nav-item px-3">
+  <a href="logout" class="nav-link">Wyloguj się</a>
+</li>
+{% endif %}
+{% endblock linki %}
+
+{% if user.role_id == 1 %}
+{% block adminCheck %}
+<div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
+  <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+</div>
+{% endblock adminCheck %}
+{% endif %}

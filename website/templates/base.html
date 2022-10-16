@@ -26,18 +26,18 @@
           <div class="collapse navbar-collapse" id="navmenu">
             <ul class="navbar-nav ms-auto">
             {% block linki %}
-              <li class="nav-item px-3">
-                <a href="contact" class="nav-link">Kontakt</a>
-              </li>
-              <li class="nav-item px-3">
-                <a href="error_submit" class="nav-link">Zgłoś błąd</a>
-              </li>
             {% endblock linki %}
             </ul>
           </div>
         </div>
+      </nav>
+
+    <!-- Log-in -->
+    <section class="text-light carousel-caption w-75 h-75 mt-5" style="top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(37, 37, 37, 0.7); border-radius: 2vw;">
+        {% block glownyPanel %}
+        {% endblock glownyPanel %}
         {% with messages = get_flashed_messages(with_categories = true) %}
-        {% if messages %}
+      {% if messages %}
         {% for category, message in messages %}
         {% if category == 'error' %}
           <div class="alert alert-danger alert-dismissable fade show position-fixed d-block" role="alert">
@@ -57,17 +57,17 @@
         {% endfor %}
       {% endif %}
       {% endwith %}
-      </nav>
-
-    <!-- Log-in -->
-    <section class="text-light carousel-caption w-75 h-75 mt-5" style="top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(37, 37, 37, 0.7); border-radius: 2vw;">
-        {% block glownyPanel %}
-        {% endblock glownyPanel %}
     </section>
 
     <section class="text-light carousel-caption bottom-0 d-inline-block py-0" style="color: grey;">
         <p>v1.0 - Projekt inżynierski ©Jakub Domoń</p>
     </section>
+    
+    {% block adminCheck %}
+    <div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
+      <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+    </div>
+    {% endblock adminCheck %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
