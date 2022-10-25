@@ -1,11 +1,21 @@
 {% extends 'base.html' %}
 
+{% block js %}
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+{% endblock %}
+
 {% block linki %}
 {% if user.is_authenticated %}
 {% if user.role_id == 1 %}
-<li class="nav-item px-3">
-    <a href="signin" class="nav-link">Dodaj pracownika</a>
-  </li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Użytkownicy
+  </a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="signin">Dodaj użytkownika</a>
+    <div class="dropdown-divider w-75 mx-auto"></div>
+    <a class="dropdown-item" href="delete">Lista użytkowników</a>
+</li>
 {% endif %}
 <li class="nav-item px-3">
   <a href="contact" class="nav-link">Kontakt</a>
@@ -18,11 +28,133 @@
 </li>
 {% endif %}
 {% endblock linki %}
+{% block glownyPanel %}
+    <div class="row h-100 w-100 my-auto top-0">
+  <div class="col-2 h-100 d-inline-block" style="border-right: 1px solid #6e6e6e;">
+    <div class="list-group" id="list-tab" role="tablist">
+      <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
+      <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
+      <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
+      <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+    </div>
+  </div>
 
-{% if user.role_id == 1 %}
-{% block adminCheck %}
-<div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
-  <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+  <div id="dashboard" class="col w-75 h-100 tab-content" id="nav-tabContent">
+    <div class="row mx-auto h-50">
+      <div class="col w-50">
+        <div>
+          <h5>Wyprodukowane sztuki:</h5>
+          <hr class="w-50 mx-auto">
+          <div>
+            <p id="tekst">000</p>
+          </div>
+        </div>
+      </div>
+      <div class="col w-50">
+        <div>
+          <h5>Wyprodukowane sztuki:</h5>
+          <hr class="w-50 mx-auto">
+        </div>
+        <canvas id="chart2" height="100%"></canvas>
+      </div>
+    </div>
+    <div class="row mx-auto h-50">
+      <div class="col w-50">
+        <div>
+          <h5>Wyprodukowane sztuki:</h5>
+          <hr class="w-50 mx-auto">
+        </div>
+        <canvas id="chart3" height="100%"></canvas>
+      </div>
+      <div class="col w-50">
+        <div>
+          <h5>Wyprodukowane sztuki:</h5>
+          <hr class="w-50 mx-auto">
+        </div>
+        <canvas id="chart4" height="100%"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock adminCheck %}
+
+    <script>
+          // line chart
+         chart1 = new Chart(document.getElementById("chart2"), {
+            type: 'line',
+            data: {
+              labels: ["Poniedziałek","Wtorek"],
+              datasets: [
+                {
+                  label: "Ilość wyprodukowanych sztuk produktu",
+                  backgroundColor: ["#ffffff"],
+                  color: '#ffffff',
+                  data: [],
+                }
+              ]
+            },
+            options: {
+              legend: { display: false },
+              title: {
+                display: false,
+                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
+                colors: ["blue", "#76BDD1"]
+              }
+             }
+           });
+
+           chart2 = new Chart(document.getElementById("chart3"), {
+            type: 'bar',
+            data: {
+              labels: ["Poniedziałek","Wtorek"],
+              datasets: [
+                {
+                  label: "Ilość wyprodukowanych sztuk produktu",
+                  backgroundColor: ["#ffffff","#ffffff"],
+                  color: '#ffffff',
+                  data: [1000, 1300],
+                }
+              ]
+            },
+            options: {
+              legend: { display: false },
+              title: {
+                display: false,
+                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
+                colors: ["blue", "#ffffff"]
+              }
+            }
+          });
+
+          chart3 = new Chart(document.getElementById("chart4"), {
+            type: 'bar',
+            data: {
+              labels: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
+              datasets: [
+                {
+                  label: "Ilość wyprodukowanych sztuk produktu",
+                  backgroundColor: ["#ffffff", "#ffffff","#ffffff","#ffffff","#ffffff","#ffffff","#ffffff"],
+                  color: '#ffffff',
+                  data: [1000,1200,1400,1400,900,950,700],
+                }
+              ]
+            },
+            options: {
+              legend: { display: false },
+              title: {
+                display: false,
+                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
+                colors: ["blue", "#ffffff"]
+              }
+            }
+          });
+          setInterval(retrieveData,500);
+    </script>
+
+{% endblock glownyPanel %}
+{% block admin %}
+{% if user.role_id == 1 %}
+<div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
+    <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+</div>
 {% endif %}
+{% endblock %}

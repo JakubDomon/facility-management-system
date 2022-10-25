@@ -10,7 +10,7 @@ def before_first_request():
     if not (db.session.query(db.exists().where(Role.name == 'admin')).scalar() and db.session.query(db.exists().where(Role.name == 'user')).scalar()):
         newRole1 = Role(name = "admin")
         newRole2 = Role(name = "user")
-        firstAdminUser = User(empNb=1234567, password= generate_password_hash("firstAdmin"),role_id = 1)
+        firstAdminUser = User(empNb=1234567, empName = 'Admin Admin', password= generate_password_hash("firstAdmin"),role_id = 1)
         thingsToAdd = [newRole1, newRole2, firstAdminUser]
         db.session.add_all(thingsToAdd)
         db.session.commit()

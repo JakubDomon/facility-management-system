@@ -5,6 +5,13 @@
 <li class="nav-item px-3">
   <a href="dashboard" class="nav-link">Dashboard</a>
 </li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Użytkownicy
+  </a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="delete">Lista użytkowników</a>
+</li>
 <li class="nav-item px-3">
   <a href="contact" class="nav-link">Kontakt</a>
 </li>
@@ -44,6 +51,16 @@
                           />
                         </div>
                         <div class="form-group mb-4">
+                          <label class="mb-1" for="employee_name">Imię i nazwisko pracownika:</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="employee_name"
+                            name="employee_name"
+                            placeholder="Wpisz imię i nazwisko pracownika"
+                          />
+                        </div>
+                        <div class="form-group mb-4">
                           <label class="mb-1" for="password">Hasło</label>
                           <input
                             type="password"
@@ -78,10 +95,10 @@
     
 {% endblock %}
 
+{% block admin %}
 {% if user.role_id == 1 %}
-{% block adminCheck %}
 <div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
-  <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+    <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
 </div>
-{% endblock adminCheck %}
 {% endif %}
+{% endblock %}

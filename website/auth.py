@@ -1,6 +1,8 @@
 from ast import IsNot
 from pickle import FALSE, TRUE
 from flask import Blueprint, render_template, request, flash, redirect, url_for
+
+from website.access_control import admin_access
 from .models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import time
@@ -38,9 +40,11 @@ def login():
 
 @auth.route('/signin', methods=['GET', 'POST'])
 @login_required
+@admin_access
 def signin():
     if request.method == 'POST':
         empNumber = request.form.get('employee_nb')
+        empName = request.form.get('employee_name')
         empPassword1 = request.form.get('password')
         empPassword2 = request.form.get('password2')
         adminCheck = request.form.get('switch')
@@ -53,17 +57,22 @@ def signin():
             flash('Hasła nie pokrywają się!', category='error')
         else:
             # USER CREATION
-            print(adminCheck)
+            users = User.query.filter_by(empNb = empNumber).first()
+            
+            if users:
+                flash('Użytkownik o takim numerze już istnieje!', category='error')
+                return render_template('signin.html', user = current_user)
 
-            if adminCheck == 'on':
-                new_user = User(empNb = empNumber, password = generate_password_hash(empPassword1, method='sha256'), role_id = 1)
-            else :
-                new_user = User(empNb = empNumber, password = generate_password_hash(empPassword1, method='sha256'), role_id = 2)
-            
-            db.session.add(new_user)
-            db.session.commit()
-            
-            return redirect(url_for('views.success_create'))
+            if not users:
+                if adminCheck == 'on':
+                    new_user = User(empNb = empNumber, empName = empName, password = generate_password_hash(empPassword1, method='sha256'), role_id = 1)
+                else :
+                    new_user = User(empNb = empNumber, empName = empName, password = generate_password_hash(empPassword1, method='sha256'), role_id = 2)
+                
+                db.session.add(new_user)
+                db.session.commit()
+
+                return redirect(url_for('views.success_create'))
 
     return render_template('signin.html', user = current_user)
 

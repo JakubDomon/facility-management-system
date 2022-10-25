@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
 
+{% block przekierowanie %}
+<script type="text/javascript">
+    function zmienStrone()
+    {
+      location.replace("http://127.0.0.1:5000/login");
+    }
+    setTimeout("zmienStrone();", 3000);
+    </script>
+{% endblock %}
+
 {% block glownyPanel %}
 <div class="row h-75 align-items-center">
     <div class="col-4 mx-auto w-75">

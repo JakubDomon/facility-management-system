@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+  
+{% block linki %}
+{% if user.is_authenticated %}
+<li class="nav-item px-3">
+  <a href="dashboard" class="nav-link">Dashboard</a>
+</li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Użytkownicy
+  </a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="signin">Dodaj użytkownika</a>
+</li>
+<li class="nav-item px-3">
+  <a href="contact" class="nav-link">Kontakt</a>
+</li>
+<li class="nav-item px-3">
+  <a href="error_submit" class="nav-link">Zgłoś błąd</a>
+</li>
+<li class="nav-item px-3">
+  <a href="logout" class="nav-link">Wyloguj się</a>
+</li>
+{% endif %}
+{% endblock linki %}
+
+{% block glownyPanel %}
+<div class="row-4">
+    <h1>Panel usuwania użytkowników</h1>
+    <hr class="w-50 mx-auto">
+</div>
+<div class="row-4 my-4">
+    <h3>Wybierz użytkownika, którego chcesz usunąć z systemu:</h3>
+</div>
+<div class="row-4 my-5 w-75 mx-auto overflow-auto" style="height:70%;">
+            <table id="tablica" class="table" style="color:rgb(255, 255, 255)">
+                <thead>
+                  <tr>
+                    <th scope="col">Numer pracownika</th>
+                    <th scope="col">Imię i nazwisko pracownika</th>
+                    <th scope="col">Rola w systemie</th>
+                    <th scope="col">Data dodania pracownika</th>
+                    <th scope="col">Usuń pracownika</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for users in users %}
+                    <tr>
+                        <td>{{users.empNb}}</td>
+                        <td>{{users.empName}}</td>
+                        <td>{{users.role.name}}</td>
+                        <td>{{users.confirmed_at}}</td>
+                        <td>{% if users.id == user.id %} -- {% else %}
+                            <button class="btn btn-close btn-close-white" onclick='sendUserID("{{users.id}}", "#tablica")'></button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+</div>
+{% endblock glownyPanel %}
+
+{% block admin %}
+{% if user.role_id == 1 %}
+<div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
+    <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+</div>
+{% endif %}
+{% endblock %}
