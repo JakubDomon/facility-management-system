@@ -5,6 +5,11 @@ from . import db
 from sqlalchemy.sql import func
 from flask_login import UserMixin
 
+class OPCUA(db.Model):
+    __tablename__ = 'servers'
+    id = db.Column(db.Integer, primary_key = True)
+    endpoint = db.Column(db.String(255))
+
 class Machine(db.Model):
     __tablename__ = 'machines'
     id = db.Column(db.Integer, primary_key = True)
