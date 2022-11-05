@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block glownyPanel %}
+<div class="row" style="background-color: aqua; height: 10%">
+    <div class="col w-100 mx-auto">
+        <h2>Panel dodawania stanowisk</h2>
+    </div>
+</div>
+<div class="row" style="height: 90%">
+    <div class="col w-50 mb-4 mt-4">
+        <div class="w-100">
+            <h4>Podaj dane stanowiska:</h4>
+        </div>
+        <div class="w-50 mx-auto mt-4">
+            <form method="POST">
+                <div class="form-group mb-4">
+                    <label class="mb-1" for="machine_name">Nazwa sterownika:</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="machine_name"
+                      name="machine_name"
+                      placeholder="Wpisz nazwę sterownika"
+                    />
+                </div>
+                <div class="form-group mb-4">
+                    <label class="mb-1" for="machine_date">Data montażu:</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="machine_date"
+                      name="machine_date"
+                      placeholder="Wpisz datę montażu stanowiska"
+                    />
+                </div>
+                <div class="form-group mb-4">
+                    <label class="mb-1" for="machine_endpoint">Endpoint serwera OPC:</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="machine_endpoint"
+                      name="machine_endpoint"
+                      placeholder="Wpisz endpoint serwera OPC"
+                    />
+                </div>
+                <div class="form-group mb-4">
+                    <label class="mb-1" for="machine_node">Node ID tablicy z danymi</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="machine_node"
+                      name="machine_node"
+                      placeholder="Wpisz ID node"
+                    />
+                </div>
+                <div class="mt-5">
+                    <button type="submit" class="btn btn-primary d-inline-block mx-4">Dodaj stanowisko</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col w-50 mx-auto">
+        <div class="mt-4">
+            <h4>Wzór tablicy z danymi:</h4>
+        </div>
+    </div>
+</div>
+{% endblock glownyPanel %}

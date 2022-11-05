@@ -1,6 +1,7 @@
 from enum import unique
 
 from pytz import timezone
+from sqlalchemy import ForeignKey
 from . import db
 from sqlalchemy.sql import func
 from flask_login import UserMixin
@@ -9,6 +10,9 @@ class OPCUA(db.Model):
     __tablename__ = 'servers'
     id = db.Column(db.Integer, primary_key = True)
     endpoint = db.Column(db.String(255))
+    nodes = db.Column(db.String(255))
+    machine_id = db.Column(db.Integer, ForeignKey('machines.id'))
+    status = db.Column(db.Boolean, default = False)
 
 class Machine(db.Model):
     __tablename__ = 'machines'
@@ -18,6 +22,7 @@ class Machine(db.Model):
     montageDate = db.Column(db.DateTime(timezone = True))
     addDate = db.Column(db.DateTime(timezone = True), default = func.now())
     addedBy = db.Column(db.Integer, db.ForeignKey('user.id'))
+    opcua = db.relationship('OPCUA', uselist=False, backref='machines')
 
 ## MANY TO ONE RELATIONSHIP ROLES - USER
 class User(db.Model, UserMixin):

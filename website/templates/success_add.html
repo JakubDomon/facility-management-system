@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block przekierowanie %}
+<script type="text/javascript">
+    function zmienStrone()
+    {
+      location.replace("http://127.0.0.1:5000/add_machine");
+    }
+    setTimeout("zmienStrone();", 3000);
+    </script>
+{% endblock %}
+
+{% block glownyPanel %}
+<div class="row h-75 align-items-center">
+    <div class="col-4 mx-auto w-75">
+        <h1>Pomyślnie dodano stanowisko!</h1>
+        <hr>
+    </div>
+    <div class="row h-75 align-items-center">
+        <div class="col-4 mx-auto w-75">
+            <h3>Za chwilę zostaniesz przeniesiony do panelu administracyjnego</h3>
+        </div>
+    </div>
+</div>
+{% endblock glownyPanel %}
+
+{% block admin %}
+{% if user.role_id == 1 %}
+<div class="text-light position-absolute bottom-0 end-0 mx-4 my-3" style="font-family:'Franklin Gothic Light', 'Arial Narrow', Arial, sans-serif;"> 
+    <img src="../static/img/admin.png" alt="admin" width="35vw" style="-webkit-filter:invert(100%); display:inline-block">&nbsp Jesteś administratorem
+</div>
+{% endif %}
+{% endblock %}

@@ -1,16 +1,20 @@
 from website import create_app, db, scheduler
-from website.models import Role, User
+from website.models import Role, User, Machine, OPCUA
+from website.query import QueryMachines
 from werkzeug.security import generate_password_hash
-from website.opc_client.client import connect_clients, saveOPC_data, create_Mongo, create_clients
 from flask_apscheduler import APScheduler
+from opcua import Client
+from pymongo import MongoClient
 import atexit
+import sys, socket
+import datetime
+import pickle
 
 # UTWORZENIE INSTANCJI
 app = create_app()
+clients = {}
 
-names = ["Peelce1"]
-endpoints = ["opc.tcp://192.168.0.51:4840"]
-nodesID = ["ns=4;i=4"]
+queryMachines = QueryMachines()
 
 @app.before_first_request
 def before_first_request():
@@ -22,20 +26,82 @@ def before_first_request():
         db.session.add_all(thingsToAdd)
         db.session.commit()
 
-collection = create_Mongo('localhost', 27017)
-clients = create_clients(endpoints)
-connect_clients(clients)
+# CREATE MONGODB INSTANCE
+mongoDatabase = MongoClient('localhost', 27017)
+# CREATE DATABASE AND COLLECTION
+database = mongoDatabase.SCADA
+collection = database.PLC
 
-@scheduler.task('interval', id='task1', seconds=2, misfire_grace_time=900)
-def task_every_2seconds():
-    saveOPC_data(names, clients, nodesID, collection)
+with app.app_context():
+    names, endpoints, nodesID = queryMachines.get_all(Machine)
+    print(clients)
+    if not clients:
+        for endpoints in endpoints:
+            clients[endpoints] = Client(endpoints)
+    
+    for client in clients.values():
+        print(client.server_url.geturl())
 
-mongoDB = create_Mongo('localhost', 27017)
+
+@scheduler.task('interval', id='task1', seconds=5, misfire_grace_time=900)
+def connect():
+    global clients
+    print(type(clients))
+    with app.app_context():
+        names, endpoints, nodesID = queryMachines.get_all(Machine)
+
+        print(endpoints)
+        
+        if not len(clients.keys()) == len(endpoints):
+            clientKeys = clients.keys()
+            missingClientsEndpoints = []
+            for endpoints in endpoints:
+                if not endpoints in clients:
+                    missingClientsEndpoints.append(endpoints)
+            print(missingClientsEndpoints)
+
+            for endpoints in missingClientsEndpoints:
+                clients[endpoints] = Client(endpoints)
+
+        for cli in clients.values():
+            if cli.keepalive is None:
+                try:
+                    cli.connect()
+                    print('Połączono ze sterownikiem: ' + str(cli.server_url.geturl()))
+                except:
+                    print('Błąd połączenia ze sterownikiem: ' + str(cli.server_url.geturl()))
+
+@scheduler.task('interval', id='task2', seconds=1, misfire_grace_time=900)
+def saveData():
+    global clients
+
+    with app.app_context():
+
+        for cli in clients.values():
+            if not cli.keepalive is None:
+                machine = OPCUA.query.filter_by(endpoint = cli.server_url.geturl()).first()
+                nodeVal = cli.get_node(machine.nodes).get_value()
+                post = {
+                    "machine_id": machine.machine_id,
+                    "time": datetime.datetime.utcnow(),
+                    "data1": nodeVal[0],
+                    "data2": nodeVal[1]
+                }
+
+                collection.insert_one(post)
+                collection.delete_many({'time': {"$lt" :  datetime.datetime.utcnow() - datetime.timedelta(minutes=1)}})
 
 # START APKI
 if __name__ == '__main__':
-    if scheduler.state == 0:
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(("127.0.0.1", 47200))
+    except socket.error:
+        print("Scheduler już działa")
+    else:
         scheduler.start()
+        print("Scheduler wystartował")
+    
     app.run(debug=True)
     
     atexit.register(lambda: scheduler.stop())
