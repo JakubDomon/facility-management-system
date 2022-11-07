@@ -22,7 +22,7 @@ class Machine(db.Model):
     montageDate = db.Column(db.DateTime(timezone = True))
     addDate = db.Column(db.DateTime(timezone = True), default = func.now())
     addedBy = db.Column(db.Integer, db.ForeignKey('user.id'))
-    opcua = db.relationship('OPCUA', uselist=False, backref='machines')
+    opcua = db.relationship('OPCUA', uselist=False, backref='machines', cascade="all, delete-orphan")
 
 ## MANY TO ONE RELATIONSHIP ROLES - USER
 class User(db.Model, UserMixin):

@@ -1,20 +1,14 @@
-from website import create_app, db, scheduler
+from website import create_app, db, scheduler, OWM, weatherCollection, queryMachines, collection
 from website.models import Role, User, Machine, OPCUA
-from website.query import QueryMachines
 from werkzeug.security import generate_password_hash
-from flask_apscheduler import APScheduler
 from opcua import Client
-from pymongo import MongoClient
 import atexit
-import sys, socket
+import socket
 import datetime
-import pickle
 
 # UTWORZENIE INSTANCJI
 app = create_app()
 clients = {}
-
-queryMachines = QueryMachines()
 
 @app.before_first_request
 def before_first_request():
@@ -26,15 +20,12 @@ def before_first_request():
         db.session.add_all(thingsToAdd)
         db.session.commit()
 
-# CREATE MONGODB INSTANCE
-mongoDatabase = MongoClient('localhost', 27017)
-# CREATE DATABASE AND COLLECTION
-database = mongoDatabase.SCADA
-collection = database.PLC
+        data = OWM.get_temp_icon()
+        weatherCollection.insert_one(data)
+
 
 with app.app_context():
     names, endpoints, nodesID = queryMachines.get_all(Machine)
-    print(clients)
     if not clients:
         for endpoints in endpoints:
             clients[endpoints] = Client(endpoints)
@@ -42,23 +33,18 @@ with app.app_context():
     for client in clients.values():
         print(client.server_url.geturl())
 
-
-@scheduler.task('interval', id='task1', seconds=5, misfire_grace_time=900)
+@scheduler.task('interval', id='task1', seconds=3, misfire_grace_time=900)
 def connect():
     global clients
-    print(type(clients))
     with app.app_context():
         names, endpoints, nodesID = queryMachines.get_all(Machine)
 
-        print(endpoints)
-        
+        #  CHECK IF THERE IS A NEW INSTANCE ADDED
         if not len(clients.keys()) == len(endpoints):
-            clientKeys = clients.keys()
             missingClientsEndpoints = []
             for endpoints in endpoints:
                 if not endpoints in clients:
                     missingClientsEndpoints.append(endpoints)
-            print(missingClientsEndpoints)
 
             for endpoints in missingClientsEndpoints:
                 clients[endpoints] = Client(endpoints)
@@ -72,10 +58,21 @@ def connect():
                     print('Błąd połączenia ze sterownikiem: ' + str(cli.server_url.geturl()))
 
 @scheduler.task('interval', id='task2', seconds=1, misfire_grace_time=900)
-def saveData():
+def save_data():
     global clients
-
     with app.app_context():
+        names, endpoints, nodesID = queryMachines.get_all(Machine)
+        
+        # CHECK IF THERE IS A DELETED INSTANCE
+        if not len(clients.keys()) == len(endpoints):
+            missingEndpoints = []
+            for client in clients.keys():
+                if not client in endpoints:
+                    missingEndpoints.append(client)
+            print(missingEndpoints)
+
+            for endpoints in missingEndpoints:
+                clients.pop(endpoints)
 
         for cli in clients.values():
             if not cli.keepalive is None:
@@ -90,6 +87,19 @@ def saveData():
 
                 collection.insert_one(post)
                 collection.delete_many({'time': {"$lt" :  datetime.datetime.utcnow() - datetime.timedelta(minutes=1)}})
+
+@scheduler.task('interval', id='task3', seconds=120, misfire_grace_time=900)
+def weather():
+    data = OWM.get_temp_icon()
+    weatherCollection.insert_one(data)
+
+# DO SKOŃCZENIA
+# @scheduler.task('interval', id='task3', seconds=5, misfire_grace_time=900)
+# def prepare_data():
+#     machines = Machine.query.order_by(Machine.id).all()
+    
+#     # PREPARE DATA IN EVERY MACHINE
+#     for machine in machines:
 
 # START APKI
 if __name__ == '__main__':

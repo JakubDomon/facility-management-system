@@ -1,31 +1,33 @@
 {% extends 'base.html' %}
-  
+
 {% block linki %}
 {% if user.is_authenticated %}
 <li class="nav-item px-3">
   <a href="dashboard" class="nav-link">Dashboard</a>
 </li>
+{% if user.role_id == 1 %}
 <li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Maszyny
-  </a>
-  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-    <a class="dropdown-item" href="add_machine">Dodaj maszynę</a>
-    <div class="dropdown-divider w-75 mx-auto"></div>
-    <a class="dropdown-item" href="delete_machine">Lista maszyn</a>
-</li>
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Maszyny
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <a class="dropdown-item" href="add_machine">Dodaj maszynę</a>
+  </li>
 <li class="nav-item dropdown">
   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Użytkownicy
   </a>
   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
     <a class="dropdown-item" href="signin">Dodaj użytkownika</a>
+    <div class="dropdown-divider w-75 mx-auto"></div>
+    <a class="dropdown-item" href="delete">Lista użytkowników</a>
 </li>
-<li class="nav-item px-3">
-  <a href="contact" class="nav-link">Kontakt</a>
-</li>
+{% endif %}
 <li class="nav-item px-3">
   <a href="error_submit" class="nav-link">Zgłoś błąd</a>
+</li>
+<li class="nav-item px-3">
+    <a href="contact" class="nav-link">Kontakt</a>
 </li>
 <li class="nav-item px-3">
   <a href="logout" class="nav-link">Wyloguj się</a>
@@ -35,33 +37,34 @@
 
 {% block glownyPanel %}
 <div class="row-4">
-    <h1>Panel usuwania użytkowników</h1>
+    <h1>Panel usuwania maszyn</h1>
     <hr class="w-50 mx-auto">
 </div>
 <div class="row-4 my-4">
-    <h3>Wybierz użytkownika, którego chcesz usunąć z systemu:</h3>
+    <h3>Wybierz maszynę, którą chcesz usunąć z systemu:</h3>
 </div>
 <div class="row-4 my-5 w-75 mx-auto overflow-auto" style="height:70%;">
             <table id="tablica" class="table" style="color:rgb(255, 255, 255)">
                 <thead>
                   <tr>
-                    <th scope="col">Numer pracownika</th>
-                    <th scope="col">Imię i nazwisko pracownika</th>
-                    <th scope="col">Rola w systemie</th>
-                    <th scope="col">Data dodania pracownika</th>
-                    <th scope="col">Usuń pracownika</th>
+                    <th scope="col">Nazwa maszyny</th>
+                    <th scope="col">Data dodania</th>
+                    <th scope="col">Dodany przez</th>
+                    <th scope="col">Adres serwera OPC</th>
+                    <th scope="col">Data dodania maszyny</th>
+                    <th scope="col">Usuń maszynę</th>
                   </tr>
                 </thead>
                 <tbody>
-                    {% for users in users %}
+                    {% for machine in machines %}
                     <tr>
-                        <td>{{users.empNb}}</td>
-                        <td>{{users.empName}}</td>
-                        <td>{{users.role.name}}</td>
-                        <td>{{users.confirmed_at}}</td>
-                        <td>{% if users.id == user.id %} -- {% else %}
-                            <button class="btn btn-close btn-close-white" onclick='sendID("{{users.id}}", "#tablica")' onsubmit="return confirm('Na pewno chcesz usunąć użytkownika?');"></button>
-                            {% endif %}
+                        <td>{{machine.name}}</td>
+                        <td>{{machine.addDate}}</td>
+                        <td>{{machine.addedBy}}</td>
+                        <td>{{machine.opcua.endpoint}}</td>
+                        <td>{{machine.addDate}}</td>
+                        <td>
+                            <button class="btn btn-close btn-close-white" onclick='sendID("{{machine.id}}", "#tablica")'></button>
                         </td>
                     </tr>
                     {% endfor %}

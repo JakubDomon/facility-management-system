@@ -1,13 +1,13 @@
 from ast import IsNot
 from pickle import FALSE, TRUE
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-
 from website.access_control import admin_access
 from .models import *
 from werkzeug.security import generate_password_hash, check_password_hash
 import time
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
+from website import OWM
 
 
 ## UTWORZENIE BLUEPRINTA
@@ -49,8 +49,9 @@ def login():
                 # IF RECORD NOT FOUND IN DATABASE, FLASH ERROR MESSAGE
                 flash('Nie ma takiego użytkownika!', category='error')
 
-    # IF METHOD GET, RENDER TEMPLATE 'LOGIN'    
-    return render_template('login.html', user = current_user)
+    # IF METHOD GET, RENDER TEMPLATE 'LOGIN'
+    OWM.query_collection()    
+    return render_template('login.html', user = current_user, weather = OWM)
 
 ## USER ADDING PAGE
 # input:
@@ -100,8 +101,9 @@ def signin():
 
                 return redirect(url_for('views.success_create'))
 
-    # IF METHOD GET, RENDER TEMPLATE 'SIGNIN' 
-    return render_template('signin.html', user = current_user)
+    # IF METHOD GET, RENDER TEMPLATE 'SIGNIN'
+    OWM.query_collection() 
+    return render_template('signin.html', user = current_user, weather = OWM)
 
 ## USER LOGOUT PAGE
 # To access this route, login permission is needed. 

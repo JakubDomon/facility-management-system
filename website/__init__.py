@@ -3,7 +3,25 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_manager
 from flask_apscheduler import APScheduler
+from website.query import QueryMachines
+from pymongo import MongoClient
+from website.openweathermap import OpenWeatherMapQuery
 
+
+API_KEY = '99069dfe999ff748e8d4fbc0c1678b2a'
+city = 'Rzeszów'
+
+# CREATE MONGODB INSTANCE
+mongoDatabase = MongoClient('localhost', 27017)
+# CREATE DATABASE AND COLLECTION
+database = mongoDatabase.SCADA
+collection = database.PLC
+weatherCollection = database.weather
+
+OWM = OpenWeatherMapQuery(city, API_KEY, weatherCollection)
+
+## QUERYMACHINES
+queryMachines = QueryMachines()
 ## SQLAlchemy instance and SQLite file name
 db = SQLAlchemy()
 DB_NAME = 'database1.db'

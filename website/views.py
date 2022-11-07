@@ -1,14 +1,9 @@
 from random import random
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from flask_sqlalchemy import query
 from flask_login import login_required, current_user
 from website.access_control import admin_access
 from website.models import User, db, Machine, OPCUA
-from website.opc_client.client import Client
-from time import time
-from flask import jsonify
-import pickle
-
+from website import OWM
 
 ## UTWORZENIE BLUEPRINTA
 views = Blueprint('views', __name__)
@@ -23,12 +18,16 @@ def home():
 def contact():
     data = request.form
     print(data)
-    return render_template('contact.html', user=current_user)
+
+    OWM.query_collection()
+    return render_template('contact.html', user=current_user, weather = OWM)
 
 @views.route('/error', methods=['GET', 'POST'])
 @login_required
 def error():
-    return render_template('error_submit.html', user=current_user)
+
+    OWM.query_collection()
+    return render_template('error_submit.html', user=current_user, weather = OWM)
 
 @views.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -49,7 +48,9 @@ def dashboard():
                 }
             }
             return response
-    return render_template('dashboard.html', user=current_user)
+
+    OWM.query_collection()
+    return render_template('dashboard.html', user=current_user, weather = OWM)
 
 @views.route('/success_login', methods=['GET'])
 @login_required
@@ -82,7 +83,27 @@ def delete():
         return response
 
     users_ls = User.query.order_by(User.id).all()
-    return render_template('delete.html', user=current_user, users=users_ls)
+    OWM.query_collection()
+    return render_template('delete.html', user=current_user, users=users_ls, weather = OWM)
+
+@views.route('/delete_machine', methods=['GET', 'POST'])
+@login_required
+@admin_access
+def delete_machine():
+
+    if request.method == 'POST':
+        machine_id = request.json['ID']
+        machineToDelete = Machine.query.filter(Machine.id == machine_id).first()
+        db.session.delete(machineToDelete)
+        db.session.commit()
+        response = {
+            "data": "200"
+        }
+        return response
+
+    machines_ls = Machine.query.order_by(Machine.id).all()
+    OWM.query_collection()
+    return render_template('delete_machine.html', user=current_user, machines=machines_ls, weather = OWM)
 
 @views.route('/add_machine', methods=['GET', 'POST'])
 @login_required
@@ -113,4 +134,5 @@ def add_machine():
 
         return redirect(url_for('views.success_add'))
 
-    return render_template('add_machine.html', user=current_user)
+    OWM.query_collection()
+    return render_template('add_machine.html', user=current_user, weather = OWM)

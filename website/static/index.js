@@ -1,20 +1,22 @@
-function sendUserID(userID, divID){
-    $.ajax({
-        type: "POST",
-        url: "/delete",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            ID: userID
-        }),
-        success: function (response) {
-            if(response.data == "200"){
-                update_current_div(divID);
+function sendID(ObjectID, divID){
+    if (confirm('Jesteś pewien że chcesz usunąć ?')) {
+        $.ajax({
+            type: "POST",
+            url: window.location.pathname,
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                ID: ObjectID
+            }),
+            success: function (response) {
+                if(response.data == "200"){
+                    update_current_div(divID);
+                }
+            },
+            error: function () {
             }
-        },
-        error: function () {
-        }
-    });
+        });
+      }
 };
 
 function retrieveData(){

@@ -66,10 +66,14 @@
       {% endwith %}
     </section>
 
+    
     <section class="text-light carousel-caption bottom-0 d-inline-block py-0" style="color: grey;">
         <p>v1.0 - Projekt inżynierski ©Jakub Domoń</p>
     </section>
 
+    <div class="text-light position-absolute bottom-0 start-0 mx-4 "> 
+      <p>Pogoda w {{weather.city}}: <img src="{{weather.icon}}" alt="" height="50vh">, {{weather.temp}}°C</p>
+    </div>
     {% block admin %}
     {% endblock %}
 
