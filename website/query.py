@@ -31,12 +31,16 @@ class QueryMachines:
         
         machines = Machines.query.all()
 
-        nodes = []
+        nodesSensors = []
+        nodesData = []
+        nodesProduction = []
 
         for machines in machines:
-            nodes.append(str(machines.name))
+            nodesSensors.append(str(machines.opcua.nodesSensors))
+            nodesData.append(str(machines.opcua.nodesData))
+            nodesProduction.append(str(machines.opcua.nodesProduction))
         
-        return nodes
+        return nodesProduction, nodesData, nodesSensors
 
 
     def get_all(self, Machines):
@@ -45,11 +49,9 @@ class QueryMachines:
 
         names = []
         endpoints = []
-        nodesID = []
 
         for machines in machines:
             names.append(str(machines.name))
             endpoints.append(str(machines.opcua.endpoint))
-            nodesID.append(str(machines.opcua.nodes))
 
-        return names, endpoints, nodesID
+        return names, endpoints

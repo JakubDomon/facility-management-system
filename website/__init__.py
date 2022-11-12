@@ -17,6 +17,7 @@ mongoDatabase = MongoClient('localhost', 27017)
 database = mongoDatabase.SCADA
 collection = database.PLC
 weatherCollection = database.weather
+data = database.data
 
 OWM = OpenWeatherMapQuery(city, API_KEY, weatherCollection)
 

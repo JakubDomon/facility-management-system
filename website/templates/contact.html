@@ -4,10 +4,10 @@
 {% block linki %}
 {% if user.is_authenticated %}
 <li class="nav-item px-3">
-  <a href="dashboard" class="nav-link">Dashboard</a>
+  <a href="dashboard/1" class="nav-link">Dashboard</a>
 </li>
 {% if user.role_id == 1 %}
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Maszyny
     </a>
@@ -16,7 +16,7 @@
       <div class="dropdown-divider w-75 mx-auto"></div>
       <a class="dropdown-item" href="delete_machine">Lista maszyn</a>
   </li>
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Użytkownicy
   </a>

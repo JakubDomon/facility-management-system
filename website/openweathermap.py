@@ -38,7 +38,7 @@ class OpenWeatherMap:
             response = requests.get(self.__address__).json()
             return response
         except:
-            print('Błąd odczytu openweathermap dla: ' + str(self.__city__))
+            print('Błąd odczytu openweathermap dla: ' + str(self.get_city()))
     
     def get_temp_icon(self):
         response = self.__request_json__()

@@ -3,17 +3,17 @@
 {% block linki %}
 {% if user.is_authenticated %}
 <li class="nav-item px-3">
-  <a href="dashboard" class="nav-link">Dashboard</a>
+  <a href="dashboard/1" class="nav-link">Dashboard</a>
 </li>
 {% if user.role_id == 1 %}
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Maszyny
     </a>
     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
       <a class="dropdown-item" href="delete_machine">Lista maszyn</a>
   </li>
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Użytkownicy
   </a>
@@ -42,7 +42,7 @@
     </div>
 </div>
 <div class="row" style="height: 90%">
-    <div class="col w-50 mb-4 mt-4">
+    <div class="col w-50 mb-4 mt-4" style="overflow-y: scroll; height:80%">
         <div class="w-100">
             <h4>Podaj dane stanowiska:</h4>
         </div>
@@ -69,6 +69,16 @@
                     />
                 </div>
                 <div class="form-group mb-4">
+                  <label class="mb-1" for="machine_description">Opis:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="machine_description"
+                    name="machine_description"
+                    placeholder="Wpisz opis maszyny"
+                  />
+              </div>
+                <div class="form-group mb-4">
                     <label class="mb-1" for="machine_endpoint">Endpoint serwera OPC:</label>
                     <input
                       type="text"
@@ -79,24 +89,52 @@
                     />
                 </div>
                 <div class="form-group mb-4">
-                    <label class="mb-1" for="machine_node">Node ID tablicy z danymi</label>
+                    <label class="mb-1" for="machine_sensor">Node ID tablicy z nazwami czujników:</label>
                     <input
                       type="text"
                       class="form-control"
-                      id="machine_node"
-                      name="machine_node"
+                      id="machine_sensor"
+                      name="machine_sensor"
                       placeholder="Wpisz ID node"
                     />
                 </div>
+                <div class="form-group mb-4">
+                  <label class="mb-1" for="machine_data">Node ID tablicy z odczytami czujników:</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="machine_data"
+                    name="machine_data"
+                    placeholder="Wpisz ID node"
+                  />
+              </div>
+              <div class="form-group mb-4">
+                <label class="mb-1" for="machine_production">Node ID tablicy z informacjami o produkcji:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="machine_production"
+                  name="machine_production"
+                  placeholder="Wpisz ID node"
+                />
+            </div>
                 <div class="mt-5">
                     <button type="submit" class="btn btn-primary d-inline-block mx-4">Dodaj stanowisko</button>
                 </div>
             </form>
         </div>
     </div>
-    <div class="col w-50 mx-auto">
+    <div class="col w-50 mx-auto h-100">
         <div class="mt-4">
             <h4>Wzór tablicy z danymi:</h4>
+        </div>
+        <div class="justify-content-center align-items-center mt-4">
+          <img src="../static/img/ExampleSendData.png" alt="img">
+        </div>
+        <div class="mt-4 w-75 mx-auto">
+          <p>Powyższa tabela przedstawia przykładowe dane wysyłane przez sterownik</p>
+          <p>Można dodać dowolną liczbę czujników oraz odczytanych danych</p>
+          <p>Pierwsza kolumna w tabeli 'ProductionData' oznacza ilość wyprodukowanych sztuk, kolejna sztuki produktu zgodne z normami 'OK', natomiast ostatnia, sztuki niezgodne z wymaganiami jakościowymi 'NOK'.</p>
         </div>
     </div>
 </div>

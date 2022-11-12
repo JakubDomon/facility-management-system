@@ -24,7 +24,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 fixed-top">
         <div class="container-fluid" style="width: 90%;">
-          <a href="dashboard" class="navbar-brand"><img src="../static/img/logo.png" alt="logo" width="55vw" style="-webkit-filter:invert(100%);">{% block nazwauslugi %} &nbsp Facility Management System {% endblock nazwauslugi %} </a>
+          <a href="../dashboard/1" class="navbar-brand"><img src="../static/img/logo.png" alt="logo" width="55vw" style="-webkit-filter:invert(100%);">{% block nazwauslugi %} &nbsp Facility Management System {% endblock nazwauslugi %} </a>
   
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="navmenu">
             <span class="navbar-toggler-icon"></span>
@@ -40,7 +40,7 @@
       </nav>
 
     <!-- Log-in -->
-    <section class="text-light carousel-caption h-75 mt-5" style="top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(37, 37, 37, 0.9); border-radius: 2vw; width:90%;">
+    <section class="text-light carousel-caption h-75 mt-5" style="top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(43, 43, 43, 0.90); border-radius: 2vw; width:90%;">
         {% block glownyPanel %}
         {% endblock glownyPanel %}
         {% with messages = get_flashed_messages(with_categories = true) %}
@@ -71,8 +71,10 @@
         <p>v1.0 - Projekt inżynierski ©Jakub Domoń</p>
     </section>
 
-    <div class="text-light position-absolute bottom-0 start-0 mx-4 "> 
-      <p>Pogoda w {{weather.city}}: <img src="{{weather.icon}}" alt="" height="50vh">, {{weather.temp}}°C</p>
+    <div class="text-light position-absolute bottom-0 start-0 mx-4"> 
+      <div class="px-3" style="background-color: rgba(43, 43, 43, 0.90); border-radius:20px;">
+        <p>Pogoda w {{weather.city}}: <img src="{{weather.icon}}" alt="" height="50vh">  {{weather.temp}}°C</p>
+      </div>
     </div>
     {% block admin %}
     {% endblock %}

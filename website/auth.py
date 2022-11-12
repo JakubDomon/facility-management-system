@@ -112,4 +112,5 @@ def signin():
 @login_required
 def logout():
     logout_user()
-    return render_template('success_logout.html')
+    OWM.query_collection()
+    return render_template('success_logout.html', weather = OWM)

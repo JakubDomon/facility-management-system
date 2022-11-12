@@ -7,44 +7,46 @@
 {% block linki %}
 {% if user.is_authenticated %}
 {% if user.role_id == 1 %}
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Maszyny
   </a>
   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-    <a class="dropdown-item" href="add_machine">Dodaj maszynę</a>
+    <a class="dropdown-item" href="../add_machine">Dodaj maszynę</a>
     <div class="dropdown-divider w-75 mx-auto"></div>
-    <a class="dropdown-item" href="delete_machine">Lista maszyn</a>
+    <a class="dropdown-item" href="../delete_machine">Lista maszyn</a>
 </li>
-<li class="nav-item dropdown">
+<li class="nav-item dropdown px-3">
   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Użytkownicy
   </a>
   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-    <a class="dropdown-item" href="signin">Dodaj użytkownika</a>
+    <a class="dropdown-item" href="../signin">Dodaj użytkownika</a>
     <div class="dropdown-divider w-75 mx-auto"></div>
-    <a class="dropdown-item" href="delete">Lista użytkowników</a>
+    <a class="dropdown-item" href="../delete">Lista użytkowników</a>
 </li>
 {% endif %}
 <li class="nav-item px-3">
-  <a href="contact" class="nav-link">Kontakt</a>
+  <a href="../contact" class="nav-link">Kontakt</a>
 </li>
 <li class="nav-item px-3">
-  <a href="error_submit" class="nav-link">Zgłoś błąd</a>
+  <a href="../error_submit" class="nav-link">Zgłoś błąd</a>
 </li>
 <li class="nav-item px-3">
-  <a href="logout" class="nav-link">Wyloguj się</a>
+  <a href="../logout" class="nav-link">Wyloguj się</a>
 </li>
 {% endif %}
 {% endblock linki %}
 {% block glownyPanel %}
     <div class="row h-100 w-100 my-auto top-0">
   <div class="col-2 h-100 d-inline-block" style="border-right: 1px solid #6e6e6e;">
-    <div class="list-group" id="list-tab" role="tablist">
-      <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
-      <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
-      <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
-      <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+    <div class="mt-3">
+      <h3 class="mb-5">Lista maszyn:</h3>
+      {% for machines in machines %}
+      <h5><a href="{{machines.id}}" class="text-light">{{machines.name}}</a></h5>
+      <hr class="mx-auto w-75">
+      {% endfor %}
+      
     </div>
   </div>
 
@@ -52,32 +54,50 @@
     <div class="row mx-auto h-50">
       <div class="col w-50">
         <div>
-          <h5>Wyprodukowane sztuki:</h5>
+          <h5>Dane maszyny:</h5>
           <hr class="w-50 mx-auto">
-          <div>
-            <p id="tekst">000</p>
+          <div class="text-start ms-3">
+            <h4 class="mb-3">Nazwa maszyny: {{machine.name}}</h4>
+            <h5>Data produkcji: {{machine.dateOfProduction}}</h5>
+            <h5>Data dodania: {{machine.addDate}}</h5>
+            <h5>Dodany przez: {{machine.addedBy}}</h5>
+            <h5>Opis: {{machine.description}}</h5>
           </div>
         </div>
       </div>
-      <div class="col w-50">
+      <div id="pole1" class="col w-50">
         <div>
-          <h5>Wyprodukowane sztuki:</h5>
+          <h5>Odczyty czujników:</h5>
           <hr class="w-50 mx-auto">
         </div>
-        <canvas id="chart2" height="100%"></canvas>
+        <table class="table text-white">
+          <thead>
+            <tr>
+              <th scope="col" class="w-50">Czujnik</th>
+              <th scope="col">Odczytana wartość </th>
+            </tr>
+          </thead>
+          <tbody id="replaceData" style="font-size: 15px;">
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="row mx-auto h-50">
-      <div class="col w-50">
+    <hr style="transform:translate(0,-20px)">
+    <div class="row mx-auto h-50" >
+      <div id="pole2" class="col w-50">
         <div>
-          <h5>Wyprodukowane sztuki:</h5>
+          <h5>Statystyki produkcji</h5>
           <hr class="w-50 mx-auto">
         </div>
-        <canvas id="chart3" height="100%"></canvas>
+        <canvas id="chart1" height="100%"></canvas>
       </div>
-      <div class="col w-50">
+      <div id="pole3" class="col w-50">
         <div>
-          <h5>Wyprodukowane sztuki:</h5>
+          <h5>Historia wyprodukowanych sztuk:</h5>
           <hr class="w-50 mx-auto">
         </div>
         <canvas id="chart4" height="100%"></canvas>
@@ -87,76 +107,61 @@
 </div>
 
     <script>
-          // line chart
-         chart1 = new Chart(document.getElementById("chart2"), {
-            type: 'line',
-            data: {
-              labels: ["Poniedziałek","Wtorek"],
-              datasets: [
-                {
-                  label: "Ilość wyprodukowanych sztuk produktu",
-                  backgroundColor: ["#ffffff"],
-                  color: '#ffffff',
-                  data: [],
-                }
-              ]
-            },
-            options: {
-              legend: { display: false },
-              title: {
-                display: false,
-                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
-                colors: ["blue", "#76BDD1"]
-              }
-             }
-           });
-
-           chart2 = new Chart(document.getElementById("chart3"), {
-            type: 'bar',
-            data: {
-              labels: ["Poniedziałek","Wtorek"],
-              datasets: [
-                {
-                  label: "Ilość wyprodukowanych sztuk produktu",
-                  backgroundColor: ["#ffffff","#ffffff"],
-                  color: '#ffffff',
-                  data: [1000, 1300],
-                }
-              ]
-            },
-            options: {
-              legend: { display: false },
-              title: {
-                display: false,
-                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
-                colors: ["blue", "#ffffff"]
-              }
+      Chart.defaults.global.defaultFontColor = "#fff"
+      chart1 = new Chart(document.getElementById("chart1"), {
+      type: 'bar',
+      data: {
+        labels: ["Całkowita ilość","OK","NOK"],
+        datasets: [
+          {
+            label: "Ilość wyprodukowanych sztuk produktu",
+            backgroundColor: ["#FAFAD2","#7CFC00","#FF0000"],
+            color: '#ffffff',
+            data: [],
+          }
+        ]
+      },
+      options: {
+        legend: { display: false },
+        title: {
+          display: false,
+          text: '',
+          colors: ["blue", "#ffffff"]
+        },
+        scales: {
+          yAxes: [{
+            display: true,
+            ticks: {
+                beginAtZero: true,
             }
-          });
+        }]
+      }
+      }
+      });
 
-          chart3 = new Chart(document.getElementById("chart4"), {
-            type: 'bar',
-            data: {
-              labels: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
-              datasets: [
-                {
-                  label: "Ilość wyprodukowanych sztuk produktu",
-                  backgroundColor: ["#ffffff", "#ffffff","#ffffff","#ffffff","#ffffff","#ffffff","#ffffff"],
-                  color: '#ffffff',
-                  data: [1000,1200,1400,1400,900,950,700],
-                }
-              ]
-            },
-            options: {
-              legend: { display: false },
-              title: {
-                display: false,
-                text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
-                colors: ["blue", "#ffffff"]
-              }
+      chart2 = new Chart(document.getElementById("chart4"), {
+        type: 'bar',
+        data: {
+          labels: ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"],
+          datasets: [
+            {
+              label: "Ilość wyprodukowanych sztuk produktu",
+              backgroundColor: ["#ffffff", "#ffffff","#ffffff","#ffffff","#ffffff","#ffffff","#ffffff"],
+              color: '#ffffff',
+              data: [1000,1200,1400,1400,900,950,700],
             }
-          });
-          setInterval(retrieveData,500);
+          ]
+        },
+        options: {
+          legend: { display: false },
+          title: {
+            display: false,
+            text: 'Ilość wyprodukowanych sztuk produktu w ostatnich 7 dniach',
+            colors: ["blue", "#ffffff"]
+          }
+        }
+      });
+      setInterval(retrieveData,500);
     </script>
 
 {% endblock glownyPanel %}

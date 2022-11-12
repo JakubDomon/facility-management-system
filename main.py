@@ -1,4 +1,4 @@
-from website import create_app, db, scheduler, OWM, weatherCollection, queryMachines, collection
+from website import create_app, db, scheduler, OWM, weatherCollection, queryMachines, collection, data
 from website.models import Role, User, Machine, OPCUA
 from werkzeug.security import generate_password_hash
 from opcua import Client
@@ -25,19 +25,16 @@ def before_first_request():
 
 
 with app.app_context():
-    names, endpoints, nodesID = queryMachines.get_all(Machine)
+    names, endpoints = queryMachines.get_all(Machine)
     if not clients:
         for endpoints in endpoints:
             clients[endpoints] = Client(endpoints)
-    
-    for client in clients.values():
-        print(client.server_url.geturl())
 
 @scheduler.task('interval', id='task1', seconds=3, misfire_grace_time=900)
 def connect():
     global clients
     with app.app_context():
-        names, endpoints, nodesID = queryMachines.get_all(Machine)
+        names, endpoints = queryMachines.get_all(Machine)
 
         #  CHECK IF THERE IS A NEW INSTANCE ADDED
         if not len(clients.keys()) == len(endpoints):
@@ -57,11 +54,12 @@ def connect():
                 except:
                     print('Błąd połączenia ze sterownikiem: ' + str(cli.server_url.geturl()))
 
-@scheduler.task('interval', id='task2', seconds=1, misfire_grace_time=900)
+@scheduler.task('interval', id='task2', seconds=0.5, misfire_grace_time=900)
 def save_data():
     global clients
     with app.app_context():
-        names, endpoints, nodesID = queryMachines.get_all(Machine)
+        names, endpoints = queryMachines.get_all(Machine)
+        # nodesProduction, nodesData, nodesSensors = queryMachines.get_nodes(Machine)
         
         # CHECK IF THERE IS A DELETED INSTANCE
         if not len(clients.keys()) == len(endpoints):
@@ -77,16 +75,25 @@ def save_data():
         for cli in clients.values():
             if not cli.keepalive is None:
                 machine = OPCUA.query.filter_by(endpoint = cli.server_url.geturl()).first()
-                nodeVal = cli.get_node(machine.nodes).get_value()
+                valueNameSensors = cli.get_node(machine.nodesSensors).get_value()
+                valueDataSensors = cli.get_node(machine.nodesData).get_value()
+                valueProdction = cli.get_node(machine.nodesProduction).get_value()
+
+                valueDataSensor = []
+                for item in valueDataSensors:
+                    valueDataSensor.append(round(item,3))
+
+                print(valueDataSensor)
                 post = {
                     "machine_id": machine.machine_id,
                     "time": datetime.datetime.utcnow(),
-                    "data1": nodeVal[0],
-                    "data2": nodeVal[1]
+                    "productionData": valueProdction,
+                    "sensorNames": valueNameSensors,
+                    "sensorValues": valueDataSensor
                 }
 
                 collection.insert_one(post)
-                collection.delete_many({'time': {"$lt" :  datetime.datetime.utcnow() - datetime.timedelta(minutes=1)}})
+                collection.delete_many({'time': {"$lt" :  datetime.datetime.utcnow() - datetime.timedelta(minutes=10)}})
 
 @scheduler.task('interval', id='task3', seconds=120, misfire_grace_time=900)
 def weather():

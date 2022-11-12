@@ -3,7 +3,8 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_required, current_user
 from website.access_control import admin_access
 from website.models import User, db, Machine, OPCUA
-from website import OWM
+from website import OWM, collection
+import pymongo
 
 ## UTWORZENIE BLUEPRINTA
 views = Blueprint('views', __name__)
@@ -29,45 +30,52 @@ def error():
     OWM.query_collection()
     return render_template('error_submit.html', user=current_user, weather = OWM)
 
-@views.route('/dashboard', methods=['GET', 'POST'])
+@views.route('/dashboard/<index>', methods=['GET', 'POST'])
 @login_required
-def dashboard():
+def dashboard(index):
     if request.method == 'POST':
         if request.json['data'] == "send":
-            randomize = random()*100
-            response = {
+            data = collection.find_one({'machine_id':int(index)},sort=[( '_id', pymongo.DESCENDING )])
+
+            if data is not None:
+                print(data['productionData'])
+                response = {
                 "status": "200",
-                "randomNumber": randomize,
-                "daysChart": {
-                    "day1": "Poniedziałek",
-                    "day2": "Wtorek"
-                },
-                "dataChart": {
-                    "data1": randomize,
-                    "data2": randomize*1.5
+                "productionData": data['productionData'],
+                "sensorNames": data['sensorNames'],
+                "sensorValues": data['sensorValues'] 
                 }
-            }
+            else:
+                response = {
+                    "status": "404"
+                }
+                return response
             return response
 
     OWM.query_collection()
-    return render_template('dashboard.html', user=current_user, weather = OWM)
+    machinesls = Machine.query.order_by(Machine.id).all()
+    machine = Machine.query.filter(Machine.id == index).first()
+    return render_template('dashboard.html', user=current_user, weather = OWM, machines = machinesls, machine = machine)
 
 @views.route('/success_login', methods=['GET'])
 @login_required
 def success_login():
-    return render_template('success_login.html', user=current_user)
+    OWM.query_collection()
+    return render_template('success_login.html', user=current_user, weather = OWM)
 
 @views.route('/success_create', methods=['GET'])
 @login_required
 @admin_access
 def success_create():
-    return render_template('success_create.html', user=current_user)
+    OWM.query_collection()
+    return render_template('success_create.html', user=current_user, weather = OWM)
 
 @views.route('/success_add', methods=['GET'])
 @login_required
 @admin_access
 def success_add():
-    return render_template('success_add.html', user=current_user)
+    OWM.query_collection()
+    return render_template('success_add.html', user=current_user, weather = OWM)
 
 @views.route('/delete', methods=['GET', 'POST'])
 @login_required
@@ -113,7 +121,10 @@ def add_machine():
         machine_name = request.form.get('machine_name')
         machine_date = request.form.get('machine_date')
         machine_endpoint = request.form.get('machine_endpoint')
-        machine_node = request.form.get('machine_node')
+        machine_nodeSensor = request.form.get('machine_sensor')
+        machine_nodeData = request.form.get('machine_data')
+        machine_nodeProduction = request.form.get('machine_production')
+        machine_description = request.form.get('machine_description')
 
         opc = OPCUA.query.filter_by(endpoint = machine_endpoint).first()
         
@@ -121,13 +132,13 @@ def add_machine():
             flash('Stanowisko o podanych danych już istnieje')
             return render_template('add_machine.html', user=current_user)
 
-        newMachine = Machine(name = machine_name, dateOfProduction = machine_date, addedBy = current_user.empName)
+        newMachine = Machine(name = machine_name, dateOfProduction = machine_date, description = machine_description, addedBy = current_user.empName)
         db.session.add(newMachine)
         db.session.commit()
 
         machine = Machine.query.filter_by(name = machine_name).first()
 
-        newOPC = OPCUA(endpoint = machine_endpoint, nodes = machine_node, machine_id = machine.id)
+        newOPC = OPCUA(endpoint = machine_endpoint, nodesSensors = machine_nodeSensor, nodesData = machine_nodeData, nodesProduction = machine_nodeProduction, machine_id = machine.id)
 
         db.session.add(newOPC)
         db.session.commit()
