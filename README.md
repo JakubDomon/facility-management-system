@@ -8,6 +8,8 @@ Admin user can manage devices and users (add, delete), normal non-admin user is 
 
 Application uses two databases - one relational (SQLite) and one non-relational (MongoDB). First one is used to save user and devices data, second one is used as a container for acquised data from devices.
 
+Dashboard shows data in real-time, refreshing interval is set to 0.3s.
+
 This project is a result of engineering work at the Rzeszów University of Technology.
 
 <hr>
